@@ -7,7 +7,7 @@ namespace portfolioAPI
     public class Projects : BaseModel
     {
         [PrimaryKey("id", false)]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [Column("created_at")]
         public DateTime Created_At { get; set; }

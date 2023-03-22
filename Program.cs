@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using portfolioAPI;
 var builder = WebApplication.CreateBuilder(args);
 var key = builder.Configuration["SupabaseKey"];
@@ -19,8 +20,8 @@ app.MapGet("/projects", async () =>
 {
     var result = await supabase.From<Projects>().Get();
     var projects = result.Models;
-    Console.WriteLine(projects);
-    return projects;
+    string json = JsonConvert.SerializeObject(projects);
+    return json;
 });
 /* 
     error: The type 'Postgrest.Attributes.PrimaryKeyAttribute' is not a supported
@@ -29,6 +30,8 @@ app.MapGet("/projects", async () =>
     5[Postgrest.Attributes.PrimaryKeyAttribute,System.String,System.Boolean,System.Object,System.Object]'.
 
     possible solution: nuget Newtonsoft package for its serialization 
+    
+    EDIT: fixed with the Newtonsoft package 
  */
 
 app.Run();
