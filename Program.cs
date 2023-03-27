@@ -1,8 +1,11 @@
 using Newtonsoft.Json;
 using portfolioAPI;
+using static Postgrest.Constants;
+
 var builder = WebApplication.CreateBuilder(args);
 var key = builder.Configuration["SupabaseKey"];
 var url = builder.Configuration["SupabaseUrl"];
+
 var app = builder.Build();
 
 
@@ -20,18 +23,29 @@ app.MapGet("/projects", async () =>
 {
     var result = await supabase.From<Projects>().Get();
     var projects = result.Models;
+    if (!projects.Any()) return Results.NotFound();
     string json = JsonConvert.SerializeObject(projects);
-    return json;
+    return Results.Ok(json);
 });
-/* 
-    error: The type 'Postgrest.Attributes.PrimaryKeyAttribute' is not a supported
-    dictionary key using converter of type
-    'System.Text.Json.Serialization.Converters.SmallObjectWithParameterizedConstructorConverter`
-    5[Postgrest.Attributes.PrimaryKeyAttribute,System.String,System.Boolean,System.Object,System.Object]'.
 
-    possible solution: nuget Newtonsoft package for its serialization 
-    
-    EDIT: fixed with the Newtonsoft package 
+app.MapGet("/projects/{id}", async (int id) =>
+{
+    var result = await supabase.From<Projects>()
+    .Select("*")
+    .Filter("id", Operator.Equals, id)
+    .Get();
+    var projects = result.Models;
+    if (!projects.Any()) return Results.NotFound();
+    string json = JsonConvert.SerializeObject(projects);
+    Console.WriteLine("My model: " + json);
+    return Results.Ok(json);
+});
+
+
+
+/* 
+    new weirdness: API response looks weird in browser, but normal in console. Maybe issue with json plugin + serialization
+    of newtonsoft? EDIT: Cors issue for testing 
  */
 
 app.Run();
