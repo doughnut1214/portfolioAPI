@@ -33,11 +33,11 @@ app.MapGet("/projects/{id}", async (int id) =>
     var result = await supabase.From<Projects>()
     .Select("*")
     .Filter("id", Operator.Equals, id)
-    .Get();
-    var projects = result.Models;
-    if (!projects.Any()) return Results.NotFound();
+    .Single();
+    var projects = result;
+    if (projects == null) return Results.NotFound();
     string json = JsonConvert.SerializeObject(projects);
-    Console.WriteLine("My model: " + json);
+    
     return Results.Ok(json);
 });
 
